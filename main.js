@@ -7,6 +7,7 @@ canvas.height=280;
 
 const rectWidth = 60;
 const rectHeight = 60;
+const moveSpeed = 10;
 
 // コンテキストの取得
 var ctx = canvas.getContext('2d');
@@ -56,7 +57,7 @@ class MyRect {
             return;
         }
         let moveX = 0;
-        let moveY = -5;
+        let moveY = -1 * moveSpeed;
         let afterX = this.x;
         let afterY = this.y - moveCount * this.width;
         this.animateFlg = true;
@@ -67,7 +68,7 @@ class MyRect {
             return;
         }
         let moveX = 0;
-        let moveY = 5;
+        let moveY = moveSpeed;
         let afterX = this.x;
         let afterY = this.y + moveCount * this.width;
         this.animateFlg = true;
@@ -77,7 +78,7 @@ class MyRect {
         if(this.animateFlg){
             return;
         }
-        let moveX = -5;
+        let moveX = -1 * moveSpeed;
         let moveY = 0;
         let afterX = this.x - moveCount * this.width;
         let afterY = this.y;
@@ -88,7 +89,7 @@ class MyRect {
         if(this.animateFlg){
             return;
         }
-        let moveX = 5;
+        let moveX = moveSpeed;
         let moveY = 0;
         let afterX = this.x + moveCount * this.width;
         let afterY = this.y;
