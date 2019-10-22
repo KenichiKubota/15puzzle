@@ -331,14 +331,16 @@ let clickFunc = function(e){
 
 }
 // ダブルタップによる拡大縮小を禁止
-document.addEventListener('touchend', function (event) {
-    console.log('touchend');
-    console.log(event);
-    // event.preventDefault();
-    return false;
-    // $(event.target).trigger('click');
-    // clickFunc(event);
-    // event.target.click.apply(null, event);
+document.addEventListener('touchend', function (e) {
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var touch = e.touches[0] || e.changedTouches[0];
+    var obj = {
+        clientX : touch.clientX - rect.left,
+        clientY : touch.clientY - rect.top
+    };
+    // クリック時の関数呼び出し
+    clickFunc(obj);
 }, false);
 
 // イベント登録
