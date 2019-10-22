@@ -167,6 +167,8 @@ let myRects = [
 // canvasをクリックしたときに呼び出す関数
 let clickFunc = function(e){
 
+    console.log('click:' + e.clientX + '/' + e.clientY);
+
     // クリックした場所
     let clickedX = e.clientX;
     let clickedY = e.clientY;
@@ -328,6 +330,16 @@ let clickFunc = function(e){
     emptyRect.y = prevClickedRectY;
 
 }
+// ダブルタップによる拡大縮小を禁止
+document.addEventListener('touchend', function (event) {
+    console.log('touchend');
+    console.log(event);
+    // event.preventDefault();
+    return false;
+    // $(event.target).trigger('click');
+    // clickFunc(event);
+    // event.target.click.apply(null, event);
+}, false);
 
 // イベント登録
 canvas.addEventListener('click', clickFunc);
