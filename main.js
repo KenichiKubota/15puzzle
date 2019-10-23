@@ -2,12 +2,48 @@
 
 // canvas要素の作成
 const canvas = document.getElementById('canvas');
-canvas.width=280;
-canvas.height=280;
+// 定数
+const myConstants = {
+    canvasWidth : 280
+    ,canvasHeight :280
+    ,rectWidth :60
+    ,rectHeight :60
+    ,moveSpeed:10
+    ,direction:{
+        up:0
+        ,down:1
+        ,left :2
+        ,right:3
+    }
+    ,colors: {
+        pattern1:{
+            colorA:'#cff09e'
+            , colorB : '#a8dba8'
+            , colorC : '#79bd9a'
+            , colorD : '#3b8686'
+        }
+        , pattern2:{
+            colorA:'#f9c00c'
+            , colorB : '#00b9f1'
+            , colorC : '#7200da'
+            , colorD : '#f9320c'
+        }
+        , pattern3:{
+            colorA:'#a3daff'
+            , colorB : '#1ec0ff'
+            , colorC : '#0080ff'
+            , colorD : '#03a6ff'
+        }
 
-const rectWidth = 60;
-const rectHeight = 60;
-const moveSpeed = 10;
+    }
+}
+
+let myRects;
+
+let selectedColorPattern = myConstants.colors.pattern1;
+
+canvas.width = myConstants.canvasHeight;
+canvas.height = myConstants.canvasHeight;
 
 // コンテキストの取得
 var ctx = canvas.getContext('2d');
@@ -15,26 +51,14 @@ var ctx = canvas.getContext('2d');
 class MyRect {
 
     constructor(x, y, num){
-        this.width = rectWidth;
-        this.height = rectHeight;
+        this.width = myConstants.rectWidth;
+        this.height = myConstants.rectHeight;
         this.x = x;
         this.y = y;
         this.nextX = x;
         this.nextY = y;
-        // this.color = color;
         this.num = num;
-        if(this.num === 0){
-            this.color = '#ffffff';
-        }else if(this.num <= 4){
-            this.color = '#cff09e';
-        }else if(this.num <= 8){
-            this.color = '#a8dba8';
-        }else if(this.num <= 12){
-            this.color = '#79bd9a';
-        }else if(this.num <= 16){
-            this.color = '#3b8686';
-        }
-
+        this.chnageColor();
         this.animateFlg = false;
         this.render();
     }
@@ -52,49 +76,55 @@ class MyRect {
         ctx.fillText(this.num, this.nextX + (this.width/2), this.nextY+(this.height/2) , 50);
     }
 
-    toUp(moveCount){
-        if(this.animateFlg){
-            return;
+    chnageColor(){
+        if(this.num === 0){
+            this.color = '#ffffff';
+        }else if(this.num <= 4){
+            this.color = selectedColorPattern.colorA;
+        }else if(this.num <= 8){
+            this.color = selectedColorPattern.colorB;
+        }else if(this.num <= 12){
+            this.color = selectedColorPattern.colorC;
+        }else if(this.num <= 16){
+            this.color = selectedColorPattern.colorD;
         }
-        let moveX = 0;
-        let moveY = -1 * moveSpeed;
-        let afterX = this.x;
-        let afterY = this.y - moveCount * this.width;
-        this.animateFlg = true;
-        this.moveCore(moveX, moveY, afterX, afterY);
     }
-    toBottom(moveCount){
+
+    move(direction, moveCount){
         if(this.animateFlg){
             return;
         }
-        let moveX = 0;
-        let moveY = moveSpeed;
-        let afterX = this.x;
-        let afterY = this.y + moveCount * this.width;
-        this.animateFlg = true;
-        this.moveCore(moveX, moveY, afterX, afterY);
-    }
-    toLeft(moveCount){
-        if(this.animateFlg){
-            return;
+
+        let moveX,moveY,afterX,afterY;
+        if(direction===myConstants.direction.up){
+            moveX = 0;
+            moveY = -1 * myConstants.moveSpeed;
+            afterX = this.x;
+            afterY = this.y - moveCount * this.width;
+    
+        }else if(direction===myConstants.direction.down){
+            moveX = 0;
+            moveY = myConstants.moveSpeed;
+            afterX = this.x;
+            afterY = this.y + moveCount * this.width;
+    
+        }else if(direction===myConstants.direction.left){
+            moveX = -1 * myConstants.moveSpeed;
+            moveY = 0;
+            afterX = this.x - moveCount * this.width;
+            afterY = this.y;
+    
+        }else if(direction===myConstants.direction.right){
+            moveX = myConstants.moveSpeed;
+            moveY = 0;
+            afterX = this.x + moveCount * this.width;
+            afterY = this.y;
+    
         }
-        let moveX = -1 * moveSpeed;
-        let moveY = 0;
-        let afterX = this.x - moveCount * this.width;
-        let afterY = this.y;
+
         this.animateFlg = true;
         this.moveCore(moveX, moveY, afterX, afterY);
-    }
-    toRight(moveCount){
-        if(this.animateFlg){
-            return;
-        }
-        let moveX = moveSpeed;
-        let moveY = 0;
-        let afterX = this.x + moveCount * this.width;
-        let afterY = this.y;
-        this.animateFlg = true;
-        this.moveCore(moveX, moveY, afterX, afterY);
+
     }
 
     moveCore(moveX, moveY, afterX, afterY){
@@ -132,37 +162,42 @@ class MyRect {
 }
 
 
-let myClosure = function(){
-    let nums = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
-    return function(){
-        let index = Math.floor(Math.random() * nums.length);
-        let num = nums[index];
-        nums = nums.filter(targetNum => num !== targetNum);
-        return num;
+let initGame = function(){
+    // クリア
+    ctx.clearRect(0, 0, myConstants.canvasWidth, myConstants.canvasHeight);
+
+    let myClosure = function(){
+        let nums = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+        return function(){
+            let index = Math.floor(Math.random() * nums.length);
+            let num = nums[index];
+            nums = nums.filter(targetNum => num !== targetNum);
+            return num;
+        }
     }
-}
 
-let rndNum = myClosure();
-
-// 初期化
-let myRects = [
+    let rndNum = myClosure();
+    
+    // 初期化
+    myRects = [
     new MyRect(0            , 0         , rndNum())
-  , new MyRect(rectWidth    , 0         , rndNum())
-  , new MyRect(rectWidth * 2, 0         , rndNum())
-  , new MyRect(rectWidth * 3, 0         , rndNum())
-  , new MyRect( 0           , rectHeight, rndNum())
-  , new MyRect(rectWidth    , rectHeight, rndNum())
-  , new MyRect(rectWidth * 2, rectHeight, rndNum())
-  , new MyRect(rectWidth * 3, rectHeight, rndNum())
-  , new MyRect( 0           , rectHeight * 2, rndNum())
-  , new MyRect(rectWidth    , rectHeight * 2, rndNum())
-  , new MyRect(rectWidth * 2, rectHeight * 2, rndNum())
-  , new MyRect(rectWidth * 3, rectHeight * 2, rndNum())
-  , new MyRect( 0           , rectHeight * 3, rndNum())
-  , new MyRect(rectWidth    , rectHeight * 3, rndNum())
-  , new MyRect(rectWidth * 2, rectHeight * 3, rndNum())
-  , new MyRect(rectWidth * 3, rectHeight * 3, rndNum())
-];
+    , new MyRect(myConstants.rectWidth    , 0         , rndNum())
+    , new MyRect(myConstants.rectWidth * 2, 0         , rndNum())
+    , new MyRect(myConstants.rectWidth * 3, 0         , rndNum())
+    , new MyRect( 0           , myConstants.rectHeight, rndNum())
+    , new MyRect(myConstants.rectWidth    , myConstants.rectHeight, rndNum())
+    , new MyRect(myConstants.rectWidth * 2, myConstants.rectHeight, rndNum())
+    , new MyRect(myConstants.rectWidth * 3, myConstants.rectHeight, rndNum())
+    , new MyRect( 0           , myConstants.rectHeight * 2, rndNum())
+    , new MyRect(myConstants.rectWidth    , myConstants.rectHeight * 2, rndNum())
+    , new MyRect(myConstants.rectWidth * 2, myConstants.rectHeight * 2, rndNum())
+    , new MyRect(myConstants.rectWidth * 3, myConstants.rectHeight * 2, rndNum())
+    , new MyRect( 0           , myConstants.rectHeight * 3, rndNum())
+    , new MyRect(myConstants.rectWidth    , myConstants.rectHeight * 3, rndNum())
+    , new MyRect(myConstants.rectWidth * 2, myConstants.rectHeight * 3, rndNum())
+    , new MyRect(myConstants.rectWidth * 3, myConstants.rectHeight * 3, rndNum())
+    ];
+}
 
 // canvasをクリックしたときに呼び出す関数
 let clickFunc = function(e){
@@ -232,7 +267,7 @@ let clickFunc = function(e){
             });
             // 移動
             filtered.forEach(rect => {
-                rect.toUp(1);
+                rect.move(myConstants.direction.up, 1);
             });
         }else{
             // 下に移動したとき
@@ -261,7 +296,7 @@ let clickFunc = function(e){
             });
             // 移動
             filtered.forEach(rect => {
-                rect.toBottom(1);
+                rect.move(myConstants.direction.down, 1);
             });
         }
     }else if(emptyRect.y === clickedRect.y){
@@ -292,7 +327,7 @@ let clickFunc = function(e){
             });
             // 移動
             filtered.forEach(rect => {
-                rect.toLeft(1);
+                rect.move(myConstants.direction.left, 1);
             });
         }else{
             // 右に移動したとき
@@ -321,7 +356,7 @@ let clickFunc = function(e){
             });
             // 移動
             filtered.forEach(rect => {
-                rect.toRight(1);
+                rect.move(myConstants.direction.right, 1);
             });
         }
     }
@@ -330,6 +365,11 @@ let clickFunc = function(e){
     emptyRect.y = prevClickedRectY;
 
 }
+
+//------------------------------
+// イベント登録
+//------------------------------
+
 // ダブルタップによる拡大縮小を禁止
 document.addEventListener('touchend', function (e) {
     e.preventDefault();
@@ -343,5 +383,24 @@ document.addEventListener('touchend', function (e) {
     clickFunc(obj);
 }, false);
 
-// イベント登録
+// キャンバスをクリックしたとき
 canvas.addEventListener('click', clickFunc);
+
+// リセットボタン
+document.getElementById('reset').addEventListener('click', initGame);
+
+// 色変え
+let changeSelectedColorPattern = function(pattern){
+    selectedColorPattern = myConstants.colors[pattern];
+    myRects.forEach(rect => rect.chnageColor());
+    myRects.forEach(rect => rect.render());
+}
+
+document.getElementById('color1').addEventListener('click' ,changeSelectedColorPattern.bind(null, 'pattern1'));
+document.getElementById('color2').addEventListener('click' ,changeSelectedColorPattern.bind(null, 'pattern2'));
+document.getElementById('color3').addEventListener('click' ,changeSelectedColorPattern.bind(null, 'pattern3'));
+
+//------------------------------
+// ゲーム初期化
+//------------------------------
+initGame();
