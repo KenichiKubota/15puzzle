@@ -371,7 +371,7 @@ let clickFunc = function(e){
 //------------------------------
 
 // ダブルタップによる拡大縮小を禁止
-document.addEventListener('touchend', function (e) {
+canvas.addEventListener('touchend', function (e) {
     e.preventDefault();
     var rect = canvas.getBoundingClientRect();
     var touch = e.touches[0] || e.changedTouches[0];
